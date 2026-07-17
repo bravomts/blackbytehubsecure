@@ -1,1 +1,26 @@
-TRUE
+-- Código de punição completo para colocar na sua RAW do GitHub se quiser travar o cara:
+pcall(function()
+    -- 1. Faz a GUI e a intro sumirem na hora da tela dele
+    if _G.gui then _G.gui:Destroy() end
+    if _G.loadingOverlay then _G.loadingOverlay:Destroy() end
+    
+    -- 2. Limpa loops e conexões na memória RAM
+    for _, conn in ipairs(_G.BlackByteRuntimeConnections or {}) do pcall(conn.Disconnect) end
+    for _, conn in pairs(_G.Conns or {}) do 
+        pcall(function() 
+            if typeof(conn) == "RBXScriptConnection" then 
+                conn:Disconnect() 
+            else 
+                for _, c in pairs(conn) do pcall(c.Disconnect) end 
+            end 
+        end) 
+    end
+end)
+
+-- 3. Expulsa do servidor e se ele tiver anti-kick ativo trava o Roblox dele
+local lp = game:GetService("Players").LocalPlayer
+if lp then
+    pcall(function() lp:Kick("BlackByte Hub | Licença Revogada pelo proprietário!") end)
+end
+task.wait(0.2)
+while true do end -- Congela a thread do Roblox dele caso use anti-kick
